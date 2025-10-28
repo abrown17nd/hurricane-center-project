@@ -1,0 +1,20 @@
+Email from Tien about data
+Hi Alex,
+
+I’m sending you the satellite dataset covering the period 2015–2023, using the IR1 spectral channel, resized to 625×500 pixels in PNG format:
+0) The label information is in the CSV format
+1) for the geographical region: 
+ biendong_startlat = -4.99
+ biendong_startlon = 90.01
+ biendong_endlat   = 34.99
+ biendong_endlon   = 134.49
+2) The dataset includes labels for several storm grades based on the RSMC Tokyo best-track data (https://www.jma.go.jp/jma/jma-eng/jma-center/rsmc-hp-pub-eg/besttrack.html), which is also processed and attached in this mail. 
+3) The original satellite data were obtained from Chiba University, Japan (https://www.cr.chiba-u.jp/databases/GEO/H8_9/FD/index_en_V20190123.html). 
+
+I hope this dataset will be helpful for your research. We will discuss later about sharing the original dataset. 
+
+If you use it for a publication, please make sure to reference our paper and also to the CEReS Himawari 8/9 gridded data.
+
+Bests,
+
+Tien

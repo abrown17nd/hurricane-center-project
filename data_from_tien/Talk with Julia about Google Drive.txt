@@ -1,0 +1,5 @@
+Talk with Julia about Google Drive and CRC
+Original dataset 
+In google server connect 
+Globus (already pay for license)
+directly download to CRC

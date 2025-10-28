@@ -1,0 +1,5 @@
+ biendong_startlat = -4.99
+ biendong_startlon = 90.01
+ biendong_endlat   = 34.99
+ biendong_endlon   = 134.49
+
