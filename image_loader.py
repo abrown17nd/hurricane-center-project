@@ -2,9 +2,7 @@ import os
 import re
 import random
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from PIL import Image
+from PIL import Image, ImageDraw
 
 # =========================================================
 # CONFIGURATION
@@ -55,9 +53,6 @@ def load_domain():
                 domain[key.strip()] = float(val)
     return domain
 
-# =========================================================
-# PIXEL <-> LAT/LON
-# =========================================================
 def pixel_to_latlon(x, y, domain):
     start_lat = domain["biendong_startlat"]
     end_lat = domain["biendong_endlat"]
@@ -107,3 +102,42 @@ def load_best_track():
     else:
         best_track["storm_name"] = ""
     return best_track
+
+# =========================================================
+# OVERLAY BBOX AND BEST TRACK
+# =========================================================
+def overlay_bbox_besttrack(image_name, df, domain, best_track):
+    row = df[df["file_name"] == image_name]
+    if row.empty:
+        return None
+
+    row = row.iloc[0]
+    img_path = os.path.join(IMAGES_DIR, image_name)
+    if not os.path.exists(img_path):
+        return None
+
+    img = Image.open(img_path).convert("RGB")
+    draw = ImageDraw.Draw(img)
+
+    # Draw bounding box
+    draw.rectangle(
+        [row["x_min"], row["y_min"], row["x_max"], row["y_max"]],
+        outline="red",
+        width=2
+    )
+
+    # Match best track record by storm name and datetime
+    subset = best_track[best_track["storm_name"].str.contains(str(row["storm_name"]), na=False)]
+    if "datetime" in best_track.columns and pd.notna(row["datetime"]) and not subset.empty:
+        subset = subset.copy()
+        subset["time_diff"] = abs(subset["datetime"] - row["datetime"])
+        subset = subset.sort_values("time_diff").head(1)
+    if subset.empty:
+        return img
+
+    bt_row = subset.iloc[0]
+    x_bt, y_bt = latlon_to_pixel(bt_row["lat"], bt_row["lon"], domain)
+    r = 8  # radius of circle
+    draw.ellipse([x_bt - r, y_bt - r, x_bt + r, y_bt + r], outline="yellow", width=2)
+
+    return img

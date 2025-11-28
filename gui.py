@@ -1,8 +1,8 @@
 import os
 import csv
 import tkinter as tk
-from PIL import Image, ImageTk
-from image_loader import load_labels
+from PIL import ImageTk
+from image_loader import load_labels, load_domain, load_best_track, overlay_bbox_besttrack
 
 # =========================================================
 # CONFIGURATION
@@ -15,10 +15,15 @@ OUTPUT_LABEL_FILE = "labels_output.txt"
 OUTPUT_LABELS_CSV = "labels_output.csv"
 
 # =========================================================
-# LOAD LABELS
+# LOAD DATA
 # =========================================================
 df = load_labels()
+domain = load_domain()
+best_track = load_best_track()
 
+# =========================================================
+# LOAD EXISTING LABELS
+# =========================================================
 label_dict = {}
 if os.path.exists(OUTPUT_LABEL_FILE):
     with open(OUTPUT_LABEL_FILE, "r") as f:
@@ -28,13 +33,12 @@ if os.path.exists(OUTPUT_LABEL_FILE):
                 label_dict[parts[0]] = parts[1]
 
 # =========================================================
-# BUILD IMAGE LIST
+# IMAGE LIST
 # =========================================================
 image_list = [f for f in os.listdir(IMAGES_DIR) if f.lower().endswith((".png", ".jpg", ".jpeg"))]
 image_list.sort()
-
 if DEBUG_MODE:
-    print(f"Loaded {len(image_list)} images from {IMAGES_DIR}")
+    print(f"DEBUG: Loaded {len(image_list)} images from {IMAGES_DIR}")
 
 # =========================================================
 # SAVE LABELS
@@ -44,17 +48,19 @@ def save_labels():
         for k, v in label_dict.items():
             f.write(f"{k},{v}\n")
     with open(OUTPUT_LABELS_CSV, "w", newline="") as f:
+        import csv
         writer = csv.writer(f)
         writer.writerow(["filename", "label"])
         for k, v in label_dict.items():
             writer.writerow([k, v])
 
 # =========================================================
-# GUI WINDOW SETUP
+# GUI SETUP
 # =========================================================
 window = tk.Tk()
 window.title("Image Labeling Tool")
 current_index = 0
+photo_cache = None  # persistent reference for ImageTk.PhotoImage
 
 img_label = tk.Label(window)
 img_label.pack()
@@ -63,33 +69,42 @@ info_label = tk.Label(window, text="", font=("Arial", 12))
 info_label.pack(pady=5)
 
 # =========================================================
-# UPDATE IMAGE
+# UPDATE IMAGE WITH OVERLAY
 # =========================================================
 def update_image():
-    global current_index
+    global current_index, photo_cache
     current_index = max(0, min(current_index, len(image_list)-1))
 
-    image_path = os.path.join(IMAGES_DIR, image_list[current_index])
-    img = Image.open(image_path).resize((IMG_WIDTH, IMG_HEIGHT))
-    photo = ImageTk.PhotoImage(img)
+    image_name = image_list[current_index]
+    if DEBUG_MODE:
+        print(f"DEBUG: Showing image {current_index+1}/{len(image_list)} -> {image_name}")
 
-    img_label.config(image=photo)
-    img_label.image = photo
+    img = overlay_bbox_besttrack(image_name, df, domain, best_track)
+    if img is None:
+        print(f"DEBUG: overlay_bbox_besttrack returned None for {image_name}")
+        return
 
-    filename = image_list[current_index]
-    status = label_dict.get(filename, "unlabeled")
-    info_label.config(text=f"{filename}   |   Label: {status}")
+    img = img.resize((IMG_WIDTH, IMG_HEIGHT))
+    photo_cache = ImageTk.PhotoImage(img)  # store reference
+    img_label.config(image=photo_cache)
+
+    status = label_dict.get(image_name, "unlabeled")
+    info_label.config(text=f"{image_name}   |   Label: {status}")
 
 # =========================================================
 # MARK GOOD / BAD
 # =========================================================
 def mark_good(event=None):
-    label_dict[image_list[current_index]] = "good"
+    filename = image_list[current_index]
+    print(f"DEBUG: Marking {filename} as good")
+    label_dict[filename] = "good"
     save_labels()
     next_image()
 
 def mark_bad(event=None):
-    label_dict[image_list[current_index]] = "bad"
+    filename = image_list[current_index]
+    print(f"DEBUG: Marking {filename} as bad")
+    label_dict[filename] = "bad"
     save_labels()
     next_image()
 
@@ -115,7 +130,6 @@ def previous_image(event=None):
 # =========================================================
 button_frame = tk.Frame(window)
 button_frame.pack(pady=10)
-
 tk.Button(button_frame, text="Good (G)", command=mark_good, bg="green", fg="white").grid(row=0, column=0, padx=5)
 tk.Button(button_frame, text="Bad (B)", command=mark_bad, bg="red", fg="white").grid(row=0, column=1, padx=5)
 tk.Button(button_frame, text="Previous", command=previous_image).grid(row=0, column=2, padx=5)
