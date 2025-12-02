@@ -1,4 +1,5 @@
 import os
+import math
 import pandas as pd
 from tkinter import Tk, Label, Canvas
 from PIL import Image, ImageTk, ImageDraw
@@ -18,18 +19,60 @@ biendong_startlon = 90.01
 biendong_endlat   = 34.99
 biendong_endlon   = 134.49
 
+# biendong_startlat = -4.99
+# biendong_endlon = 90.01
+# biendong_endlat   = 34.99
+# biendong_startlon   = 134.49
+
 # =========================================================
-# LOAD FROM PREGENERATED CSV
+# LOAD CSV
 # =========================================================
 df = pd.read_csv(csv_source)
 
 # =========================================================
-# DOMAIN CONVERSION
+# PRECOMPUTED CONSTANTS FOR PROJECTIONS
 # =========================================================
-def latlon_to_pixels(lat, lon):
+R = 6378137.0  # Earth radius (meters)
+
+def lonlat_to_mercator_m(lon_deg, lat_deg):
+    lon_rad = math.radians(lon_deg)
+    lat_rad = math.radians(lat_deg)
+    lat_rad = max(min(lat_rad, math.radians(85.05112878)), math.radians(-85.05112878))
+    x = R * lon_rad
+    y = R * math.log(math.tan(math.pi / 4 + lat_rad / 2))
+    return x, y
+
+# Precompute Mercator domain
+x_min_m, y_min_m = lonlat_to_mercator_m(biendong_startlon, biendong_startlat)
+x_max_m, y_max_m = lonlat_to_mercator_m(biendong_endlon, biendong_endlat)
+
+# Cos-lat correction
+mean_lat = (biendong_startlat + biendong_endlat) / 2
+cos_lat = math.cos(math.radians(mean_lat))
+
+# =========================================================
+# THREE PROJECTION FUNCTIONS (ALL USED)
+# =========================================================
+
+def pix_linear(lat, lon):
     x = (lon - biendong_startlon) / (biendong_endlon - biendong_startlon) * img_width
     y = img_height - (lat - biendong_startlat) / (biendong_endlat - biendong_startlat) * img_height
     return int(x), int(y)
+
+def pix_mercator(lat, lon):
+    x_m, y_m = lonlat_to_mercator_m(lon, lat)
+    nx = (x_m - x_min_m) / (x_max_m - x_min_m)
+    ny = (y_m - y_min_m) / (y_max_m - y_min_m)
+    px = int(nx * img_width)
+    py = int((1 - ny) * img_height)
+    return px, py
+
+def pix_coslat(lat, lon):
+    nx = (lon - biendong_startlon) * cos_lat / ((biendong_endlon - biendong_startlon) * cos_lat)
+    ny = (lat - biendong_startlat) / (biendong_endlat - biendong_startlat)
+    px = int(nx * img_width)
+    py = int((1 - ny) * img_height)
+    return px, py
 
 # =========================================================
 # MARK STORAGE
@@ -44,7 +87,7 @@ if os.path.exists(output_marks_file):
 # GUI SETUP
 # =========================================================
 root = Tk()
-root.title("TC Image Label Review")
+root.title("TC Image Label Review – All Projections")
 
 canvas = Canvas(root, width=img_width, height=img_height)
 canvas.pack()
@@ -72,17 +115,35 @@ def show_image():
     img = Image.open(img_path).convert("RGB")
     draw = ImageDraw.Draw(img)
 
+    # -----------------------------------------------------
     # Bounding box
+    # -----------------------------------------------------
     draw.rectangle([(row.x1, row.y1), (row.x2, row.y2)],
                    outline="red", width=3)
 
-    # Best-track point
-    px, py = latlon_to_pixels(row["Latitude of the center"],
-                              row["Longitude of the center"])
+    # -----------------------------------------------------
+    # Three projection circles
+    # -----------------------------------------------------
+    lat = row["Latitude of the center"]
+    lon = row["Longitude of the center"]
     r = 6
-    draw.ellipse((px - r, py - r, px + r, py + r),
-                 outline="yellow", width=3)
 
+    # Linear
+    px1, py1 = pix_linear(lat, lon)
+    draw.ellipse((px1 - r, py1 - r, px1 + r, py1 + r),
+                 outline="red", width=18)
+
+    # Mercator
+    px2, py2 = pix_mercator(lat, lon)
+    draw.ellipse((px2 - r, py2 - r, px2 + r, py2 + r),
+                 outline="cyan", width=3)
+
+    # Coslat
+    px3, py3 = pix_coslat(lat, lon)
+    draw.ellipse((px3 - r, py3 - r, px3 + r, py3 + r),
+                 outline="magenta", width=3)
+
+    # -----------------------------------------------------
     tk_img = ImageTk.PhotoImage(img)
     canvas.create_image(0, 0, anchor="nw", image=tk_img)
 
@@ -106,12 +167,14 @@ def prev_img(event=None):
 def mark_good(event=None):
     row = df.iloc[index]
     marks[row.image_name] = "good"
+    next_img()
     save_marks()
     show_image()
 
 def mark_bad(event=None):
     row = df.iloc[index]
     marks[row.image_name] = "bad"
+    next_img()
     save_marks()
     show_image()
 
