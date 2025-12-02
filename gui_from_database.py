@@ -19,20 +19,24 @@ biendong_startlon = 90.01
 biendong_endlat   = 34.99
 biendong_endlon   = 134.49
 
-# biendong_startlat = -4.99
-# biendong_endlon = 90.01
-# biendong_endlat   = 34.99
-# biendong_startlon   = 134.49
-
 # =========================================================
-# LOAD CSV
+# LOAD CSV  +  DEBUG
 # =========================================================
+print("DEBUG: Loading CSV:", csv_source)
 df = pd.read_csv(csv_source)
+
+print("DEBUG: CSV loaded. Number of rows:", len(df))
+print("DEBUG: Columns:", list(df.columns))
+
+# Check for missing filename values
+missing_names = df["file_name"].isna().sum()
+if missing_names > 0:
+    print("DEBUG WARNING: Missing file_name entries:", missing_names)
 
 # =========================================================
 # PRECOMPUTED CONSTANTS FOR PROJECTIONS
 # =========================================================
-R = 6378137.0  # Earth radius (meters)
+R = 6378137.0
 
 def lonlat_to_mercator_m(lon_deg, lat_deg):
     lon_rad = math.radians(lon_deg)
@@ -42,18 +46,15 @@ def lonlat_to_mercator_m(lon_deg, lat_deg):
     y = R * math.log(math.tan(math.pi / 4 + lat_rad / 2))
     return x, y
 
-# Precompute Mercator domain
 x_min_m, y_min_m = lonlat_to_mercator_m(biendong_startlon, biendong_startlat)
 x_max_m, y_max_m = lonlat_to_mercator_m(biendong_endlon, biendong_endlat)
 
-# Cos-lat correction
 mean_lat = (biendong_startlat + biendong_endlat) / 2
 cos_lat = math.cos(math.radians(mean_lat))
 
 # =========================================================
-# THREE PROJECTION FUNCTIONS (ALL USED)
+# THREE PROJECTION FUNCTIONS
 # =========================================================
-
 def pix_linear(lat, lon):
     x = (lon - biendong_startlon) / (biendong_endlon - biendong_startlon) * img_width
     y = img_height - (lat - biendong_startlat) / (biendong_endlat - biendong_startlat) * img_height
@@ -63,22 +64,19 @@ def pix_mercator(lat, lon):
     x_m, y_m = lonlat_to_mercator_m(lon, lat)
     nx = (x_m - x_min_m) / (x_max_m - x_min_m)
     ny = (y_m - y_min_m) / (y_max_m - y_min_m)
-    px = int(nx * img_width)
-    py = int((1 - ny) * img_height)
-    return px, py
+    return int(nx * img_width), int((1 - ny) * img_height)
 
 def pix_coslat(lat, lon):
     nx = (lon - biendong_startlon) * cos_lat / ((biendong_endlon - biendong_startlon) * cos_lat)
     ny = (lat - biendong_startlat) / (biendong_endlat - biendong_startlat)
-    px = int(nx * img_width)
-    py = int((1 - ny) * img_height)
-    return px, py
+    return int(nx * img_width), int((1 - ny) * img_height)
 
 # =========================================================
 # MARK STORAGE
 # =========================================================
 marks = {}
 if os.path.exists(output_marks_file):
+    print("DEBUG: Loading existing marks file.")
     old = pd.read_csv(output_marks_file)
     for idx, r in old.iterrows():
         marks[r["image_name"]] = r["mark"]
@@ -99,51 +97,58 @@ index = 0
 tk_img = None
 
 # =========================================================
-# DISPLAY FUNCTION
+# DISPLAY FUNCTION  +  DEBUG
 # =========================================================
 def show_image():
     global tk_img, index
 
-    index = max(0, min(index, len(df) - 1))
+    index_clamped = max(0, min(index, len(df) - 1))
+    if index_clamped != index:
+        print(f"DEBUG: index corrected from {index} to {index_clamped}")
+        index = index_clamped
+
     row = df.iloc[index]
 
-    img_path = os.path.join(folder_path, row["file_name"])
+    print("\n==============================================")
+    print(f"DEBUG row index: {index}")
+    print(f"DEBUG raw file_name: {row['file_name']!r}")
+
+    # Trim filename
+    file_name_clean = str(row["file_name"]).strip()
+    if file_name_clean != row["file_name"]:
+        print(f"DEBUG: filename had whitespace → '{row['file_name']}' -> '{file_name_clean}'")
+
+    img_path = os.path.join(folder_path, file_name_clean)
+
+    print("DEBUG folder_path:", folder_path)
+    print("DEBUG combined path:", img_path)
+    print("DEBUG os.path.exists:", os.path.exists(img_path))
+
     if not os.path.exists(img_path):
-        print("Missing:", img_path)
+        print("MISSING FILE:", img_path)
         return
 
     img = Image.open(img_path).convert("RGB")
     draw = ImageDraw.Draw(img)
 
-    # -----------------------------------------------------
     # Bounding box
-    # -----------------------------------------------------
     draw.rectangle([(row.x1, row.y1), (row.x2, row.y2)],
                    outline="red", width=3)
 
-    # -----------------------------------------------------
     # Three projection circles
-    # -----------------------------------------------------
     lat = row["Latitude of the center"]
     lon = row["Longitude of the center"]
     r = 6
 
-    # Linear
     px1, py1 = pix_linear(lat, lon)
-    draw.ellipse((px1 - r, py1 - r, px1 + r, py1 + r),
-                 outline="red", width=18)
+    draw.ellipse((px1-r, py1-r, px1+r, py1+r), outline="red", width=18)
 
-    # Mercator
     px2, py2 = pix_mercator(lat, lon)
-    draw.ellipse((px2 - r, py2 - r, px2 + r, py2 + r),
-                 outline="cyan", width=3)
+    draw.ellipse((px2-r, py2-r, px2+r, py2+r), outline="cyan", width=3)
 
-    # Coslat
     px3, py3 = pix_coslat(lat, lon)
-    draw.ellipse((px3 - r, py3 - r, px3 + r, py3 + r),
-                 outline="magenta", width=3)
+    draw.ellipse((px3-r, py3-r, px3+r, py3+r), outline="magenta", width=3)
 
-    # -----------------------------------------------------
     tk_img = ImageTk.PhotoImage(img)
     canvas.create_image(0, 0, anchor="nw", image=tk_img)
 
