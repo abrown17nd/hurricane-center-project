@@ -28,13 +28,12 @@ df = pd.read_csv(csv_source)
 print("DEBUG: CSV loaded. Number of rows:", len(df))
 print("DEBUG: Columns:", list(df.columns))
 
-# Check for missing filename values
 missing_names = df["file_name"].isna().sum()
 if missing_names > 0:
     print("DEBUG WARNING: Missing file_name entries:", missing_names)
 
 # =========================================================
-# PRECOMPUTED CONSTANTS FOR PROJECTIONS
+# PRECOMPUTED CONSTANTS
 # =========================================================
 R = 6378137.0
 
@@ -97,7 +96,7 @@ index = 0
 tk_img = None
 
 # =========================================================
-# DISPLAY FUNCTION  +  DEBUG
+# DISPLAY FUNCTION  +  LONG-PATH FIX + DEBUG
 # =========================================================
 def show_image():
     global tk_img, index
@@ -113,14 +112,22 @@ def show_image():
     print(f"DEBUG row index: {index}")
     print(f"DEBUG raw file_name: {row['file_name']!r}")
 
-    # Trim filename
+    # Clean filename
     file_name_clean = str(row["file_name"]).strip()
-    if file_name_clean != row["file_name"]:
-        print(f"DEBUG: filename had whitespace → '{row['file_name']}' -> '{file_name_clean}'")
 
-    img_path = os.path.join(folder_path, file_name_clean)
+    # -----------------------------------------------------
+    # WINDOWS LONG PATH FIX
+    # -----------------------------------------------------
+    folder_abs = os.path.abspath(folder_path)
+    if not folder_abs.startswith("\\\\?\\"):
+        folder_lp = "\\\\?\\" + folder_abs
+    else:
+        folder_lp = folder_abs
 
-    print("DEBUG folder_path:", folder_path)
+    img_path = os.path.join(folder_lp, file_name_clean)
+
+    print("DEBUG absolute folder:", folder_abs)
+    print("DEBUG long-path folder:", folder_lp)
     print("DEBUG combined path:", img_path)
     print("DEBUG os.path.exists:", os.path.exists(img_path))
 
@@ -128,14 +135,14 @@ def show_image():
         print("MISSING FILE:", img_path)
         return
 
+    # -----------------------------------------------------
+    # LOAD AND DRAW
+    # -----------------------------------------------------
     img = Image.open(img_path).convert("RGB")
     draw = ImageDraw.Draw(img)
 
-    # Bounding box
-    draw.rectangle([(row.x1, row.y1), (row.x2, row.y2)],
-                   outline="red", width=3)
+    draw.rectangle([(row.x1, row.y1), (row.x2, row.y2)], outline="red", width=3)
 
-    # Three projection circles
     lat = row["Latitude of the center"]
     lon = row["Longitude of the center"]
     r = 6
