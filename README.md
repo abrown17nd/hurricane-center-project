@@ -57,3 +57,12 @@ This data set has 3,945 individual objects as images of a particular time from a
 
 ### Brief characterization of samples: resolution, sensors used, illumination wavelength, ambient conditions
 As stated above, this data set uses the IR1 spectral channel, resized to 625×500 pixels in PNG format for the geographical region of the Biển Đông (East Sea, also known as the South China Sea). Since this is a static view of the sea that contains the TCs, it can be used easily for comparison across the different images.
+
+## Part 3 - First Update
+### Methods already applied
+
+### Justification for using these methods
+
+### Sample illustrations showing how methods processed training data
+
+### Code summary and instructions for running example
