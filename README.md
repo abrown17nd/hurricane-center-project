@@ -58,11 +58,79 @@ This data set has 3,945 individual objects as images of a particular time from a
 ### Brief characterization of samples: resolution, sensors used, illumination wavelength, ambient conditions
 As stated above, this data set uses the IR1 spectral channel, resized to 625×500 pixels in PNG format for the geographical region of the Biển Đông (East Sea, also known as the South China Sea). Since this is a static view of the sea that contains the TCs, it can be used easily for comparison across the different images.
 
-## Part 3 - First Update
+
+In this part you should have your data preprocessing, segmentation and feature extraction implemented. Some customized projects may not follow this standard pipeline, so remember to discuss with Adam what are the appropriate deliverables for you in this phase. 
+
+What to do and what to deliver?
+
+A report (no page limit, but try to be concise; 1000-2000 words should suffice) as a separate "Part 3" section of the readme.md in your GitHub that includes:
+A list of the methods already applied for data pre-processing and feature extraction (1 points).
+A justification why you decided to use these algorithms (6 points). For instance, if you used Canny edge detection and Hough transform to detect lines, say why you believe this feature extraction is good for your project.
+A few illustrations demonstrating how your methods processed the training data, for instance show a few segmentation results (3 points).
+For teams: explain individual contributions of each team member (this is needed to have this assignment graded).
+Push your current codes to your project repository (5 points). These codes should implement what you described in the report. Provide instructions how to run your codes on a data example (attach this example to your codes). Either Adam or the TA will run them to see how the current solution works.
+
+## Part 3 - First Update (part A, YOLO)
 ### Methods already applied
+After cleaning and organizing the data (and the fact that it took longer to get the ground truth labels working), two simple models were used.  The first was a YOLO (You Only Look Once) model, then an improvement, and then 
+
+The script trains a compact, single-object variant of a YOLO-style detector. Each image contains one storm center, supplied through bounding boxes in a CSV file. The data loader reads each image, resizes it to a fixed resolution, and converts the bounding box into a YOLO-style grid target. The image is divided into an S×S grid; the cell containing the storm center receives an objectness flag plus normalized box parameters. All other cells indicate no object.
+
+A lightweight MobileNetV2 backbone extracts convolutional features. These features are adaptively pooled to an S×S spatial map. A final 1×1 convolution produces five values per cell: objectness, center offsets, and normalized width and height. Sigmoid activations constrain outputs to usable ranges. The loss function combines objectness loss (penalizing false positives and false negatives) with a coordinate regression loss applied only to the true object cell.
+
+Training proceeds over randomly split train/validation/test groups, with performance evaluated by IoU, center-distance error, and IoU-50 recall. During inference, the model selects the cell with the highest objectness score and decodes its box prediction back to image coordinates. The approach essentially mimics YOLOv1 behavior but simplified to the single-object case, enabling focused storm-center localization.
+
 
 ### Justification for using these methods
+A compact, single-object detector is well suited for storm-center localization, and the structure of this code reflects choices that match the problem’s constraints. Each image contains only one target, allowing the training pipeline to remove the overhead of anchors, multi-scale heads, and post-processing steps designed for crowded scenes. This reduces model complexity and lowers the computational load, which is important when large satellite archives must be processed efficiently. A grid-based formulation enforces a consistent spatial representation, giving the network a stable way to associate each storm center with a single responsible cell. This structure encourages learning of coarse global geometry rather than relying on many overlapping proposals.
+
+The use of a MobileNetV2 backbone provides strong feature extraction while keeping parameters light, enabling fast training even on modest hardware. The custom loss balances objectness and coordinate accuracy, ensuring that false detections are discouraged and that precise center estimates are rewarded. The data-splitting routine, evaluation metrics, and checkpointing logic create a transparent and reproducible workflow that tracks genuine improvements rather than noise. The simplified predictor, combined with explicit IoU and distance-based validation, offers a controllable and interpretable model whose behavior aligns with meteorological use cases requiring stable, frame-level localization rather than full general-purpose detection.
 
 ### Sample illustrations showing how methods processed training data
+Here are a sample of the results of the first model (Part A)
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_0.png" alt="example_0.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_1.png" alt="example_1.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_10.png" alt="example_10.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_11.png" alt="example_11.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_12.png" alt="example_12.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_13.png" alt="example_13.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_14.png" alt="example_14.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_15.png" alt="example_15.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_16.png" alt="example_16.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_17.png" alt="example_17.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_18.png" alt="example_18.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_19.png" alt="example_19.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_2.png" alt="example_2.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_20.png" alt="example_20.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_21.png" alt="example_21.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_22.png" alt="example_22.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_23.png" alt="example_23.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_24.png" alt="example_24.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_25.png" alt="example_25.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_26.png" alt="example_26.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_27.png" alt="example_27.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_28.png" alt="example_28.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_29.png" alt="example_29.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_3.png" alt="example_3.png" style="height:200px;">
+
+  <img src="part_3_prediction_examples/yolo_version_1/example_7.png" alt="example_7.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_8.png" alt="example_8.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_9.png" alt="example_9.png" style="height:200px;">
+</div>
+
+This is an illustration of the code for the YOLO along with the Kalman filter (Part B, explanation and code to be added later).
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+
+
+  <img src="part_3_prediction_examples/yolo_version_1/example_7.png" alt="example_7.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_8.png" alt="example_8.png" style="height:200px;">
+  <img src="part_3_prediction_examples/yolo_version_1/example_9.png" alt="example_9.png" style="height:200px;">
+</div>
 
 ### Code summary and instructions for running example
+To run the test code, cd into the part_3_code_example_single_object_yolo folder and use python3 to run the file run_on_sample_subset, which uses the best_tiny_yolo_single.pth to execute on the training_and_testing_samples which has 30 examples.
+
+
+Note: Part 3 composed with the assistance of ChatGPT System using model 5.0, link provided to prompt run here: [Prompt](https://chatgpt.com/share/6936f083-7f64-8007-98f6-db3692725bce)
+
