@@ -132,9 +132,9 @@ This is an illustration of the code for the YOLO along with the Kalman filter. N
 <div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
 
 
-  <img src="part_3_prediction_examples/yolo_version_1/example_7.png" alt="example_7.png" style="height:200px;">
-  <img src="part_3_prediction_examples/yolo_version_1/example_8.png" alt="example_8.png" style="height:200px;">
-  <img src="part_3_prediction_examples/yolo_version_1/example_9.png" alt="example_9.png" style="height:200px;">
+  <img src="part_3_prediction_examples/kalman_filter_1/storm_1510.gif" alt="example_7.png" style="height:200px;">
+  <img src="part_3_prediction_examples/kalman_filter_1/storm_1618.gif" alt="example_8.png" style="height:200px;">
+  <img src="part_3_prediction_examples/kalman_filter_1/storm_1814.gif" alt="example_9.png" style="height:200px;">
 </div>
 
 ### Code summary and instructions for running example
