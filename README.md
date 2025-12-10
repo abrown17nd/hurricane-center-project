@@ -33,7 +33,6 @@ Dropsondes are small, cylindrical measurement tools that are released from airpl
 
 Sea surface temperature, along with the related ocean heat content, are thought to be an important aspect of the fueling of hurricanes. There are a variety of products that are used to extract this information, including drifters, gliders, XBTs, and buoys [NOAA Hurricane data](https://www.aoml.noaa.gov/data-products/#hurricanedata) 
 
-
 ## Part 2 - Data acquisition and preparation
 Prepare a short description of a database that you acquired (no need to upload an actual database into GitHub or Google Drive). Push the report (under "Part 2" section in your readme.md) to your semester project repo by the deadline. Include these elements into your report:
 
@@ -58,7 +57,6 @@ This data set has 3,945 individual objects as images of a particular time from a
 ### Brief characterization of samples: resolution, sensors used, illumination wavelength, ambient conditions
 As stated above, this data set uses the IR1 spectral channel, resized to 625×500 pixels in PNG format for the geographical region of the Biển Đông (East Sea, also known as the South China Sea). Since this is a static view of the sea that contains the TCs, it can be used easily for comparison across the different images.
 
-
 ## Part 3 - First Update 
 ### Methods already applied
 
@@ -75,7 +73,6 @@ Training proceeds over randomly split train/validation/test groups, with perform
 The TinyYOLO-based model above produces single-frame bounding-box estimates, including the center coordinates (cx, cy), width, height, and an objectness score for a detected storm. Each prediction is independent and inherently noisy due to factors such as illumination changes, cloud morphology, and background texture. Storms observed by satellite can drift smoothly, but the detector output may jump slightly from frame to frame because convolutional networks do not enforce temporal consistency. A Kalman filter addresses this missing temporal structure by integrating predictions over time.
 
 In this context, the Kalman filter defines a state vector that can include position, velocity, and size, typically [cx, cy, vx, vy, w, h]^T. The prediction step uses a constant-velocity model to forecast the storm’s next location, producing a smooth estimate of where it should appear in the next frame. The detector output serves as a noisy measurement, and the Kalman equations blend the predicted state with the measured state according to their uncertainties. High detector confidence moves the estimate closer to the measurement, while low confidence retains proximity to the prediction.
-
 
 ### Justification for using these methods
 (Part 3A, YOLO)
@@ -125,7 +122,6 @@ This is an illustration of the code for the YOLO along with the Kalman filter. N
 
 <div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
 
-
   <img src="part_3_prediction_examples/kalman_filter_1/storm_1510.gif" alt="example_7.png" style="height:200px;">
   <img src="part_3_prediction_examples/kalman_filter_1/storm_1618.gif" alt="example_8.png" style="height:200px;">
   <img src="part_3_prediction_examples/kalman_filter_1/storm_1814.gif" alt="example_9.png" style="height:200px;">
@@ -138,7 +134,6 @@ To run the test code, cd into the part_3_code_example_single_object_yolo folder 
 
 (Part 3B, YOLO and Kalman filter)
 To run the test code, cd into the part_3_code_example_kalman_filter folder and use python3 to run the file run_on_sample_subset_kalman.py, which uses the best_tiny_yolo_single.pth to execute on the training_and_testing_samples which has 3 images from sample storms and returns a gif file that shows the predictions.
-
 
 Note: Part 3 composed with the assistance of ChatGPT System using model 5.0, link provided to prompt run here: [Prompt](https://chatgpt.com/share/6936f083-7f64-8007-98f6-db3692725bce)
 
@@ -161,7 +156,6 @@ The following are the loss functions for the YOLO_v2 and the MLP versions of the
   <img src="part_4_prediction_examples\loss_function_graphs\mlp_loss.png" alt="example_7.png" style="height:200px;">
 </div>
 
-
 ### Short commentary related to the observed accuracy and ideas for improvements
 There while the accuracy of the training and testing of both models did shrink rapidly, the ability of the models to accurately predict the centers in the images was very minimal, as can be seen in this selection of the images.
 <div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
@@ -175,10 +169,9 @@ There while the accuracy of the training and testing of both models did shrink r
 ### Instructions how to run example code
 For the MLP, download the weights from the Google drive link [here](https://drive.google.com/file/d/1O7ko1iF_esuEihmELitYx8XlbHuXf-YX/view?usp=sharing) into the part_4_code_example\part_4_mlp folder of this repo. Then, cd into the that directory and run the infer_from_model.py. It should use the selected images to generate the images with the ground truth and the prediction (similar to the ones shown above).
 
-
 ## Part 5 - Final update
 ### Description of the test database you collected or downloaded
-After training the above in the different parts, I was using a "test set" that was derived from the original dataset provided by the authors of the [paper by Dr. Thanh-Ha Do, and Dr. Duc-Tien Du](https://www.nature.com/articles/s41598-025-12733-w), using a 80-20-20% train, validation, test split. In addition, I included approximately ______ images of a different hurricane satellite imagery from a single hurricane, Hurricane Erin, from 2025, that my research group is studying more intensely after a coordinated field campaign that launched a large variety of measurement instruments before, during, and after its passage close to Florida. The satellite images for this part were collected from the [Geostationary Operational Environmental Satellites (GOES)-R Series](https://www.ncei.noaa.gov/products/satellite/goes-r) and were downloaded, extracted, and organized by me using code that I hope to be able to share publically to better facilitate the use of the images for similar projects. The test data set is very different than the one used for training and validation for a variety of reasons. First, there are in entirely different hemispheres of the globe. Though there are in very different areas, their structures and movements are very much related. The images can be seen to be very similar therefore, and using them to test my final programs is a good use case, because the inspiration of this project was to have a way to use the trained computer vision system to predict the center of the hurricane in an image that is pulled from the GOES Satellites. These images are taken and uploaded at approximately every 10 minutes, and so it could be a useful way to find the centers quickly in an live situation.
+After training the above in the different parts, I was using a "test set" that was derived from the original dataset provided by the authors of the [paper by Dr. Thanh-Ha Do, and Dr. Duc-Tien Du](https://www.nature.com/articles/s41598-025-12733-w), using a 80-20-20% train, validation, test split. In addition, I included approximately ______ images of a different hurricane satellite imagery from a single hurricane, Hurricane Erin, from 2025, that my research group is studying more intensely after a coordinated field campaign that launched a large variety of measurement instruments before, during, and after its passage close to Florida. The satellite images for this part were collected from the [Geostationary Operational Environmental Satellites (GOES)-R Series](https://www.ncei.noaa.gov/products/satellite/goes-r) and were downloaded, extracted, and organized by me using code that I hope to be able to share publicly to better facilitate the use of the images for similar projects. The test data set is very different than the one used for training and validation for a variety of reasons. First, there are in entirely different hemispheres of the globe. Though there are in very different areas, their structures and movements are very much related. The images can be seen to be very similar therefore, and using them to test my final programs is a good use case, because the inspiration of this project was to have a way to use the trained computer vision system to predict the center of the hurricane in an image that is pulled from the GOES Satellites. These images are taken and uploaded at approximately every 10 minutes, and so it could be a useful way to find the centers quickly in an live situation.
 
 ### Classification accuracy achieved on the test set
 Since there were two sets of test data, the original 20% of the split, as well as the more recent attempt to apply this network to the unseen satellite images from the other hemisphere (in the Atlantic Ocean), I will briefly describe the accuracy achieved by both of these methods. The first is using the predictions versus the ground truth distance by taking the Euclidean distance between the two points. Below are the total MSE of these.  
@@ -196,13 +189,15 @@ Clearly, this is very far from the center of the hurricane, and reasons why will
 
 ### Reasons for solution performance and possible improvements to lower observed error rates
 There are a variety of reasons for the solution performance.  First, on the test data, the model was not super accurate on the validation examples, and so it would be expected to also not be very accurate in the test data.  Improving the model to be more robust (using the actual YOLO v8 or the DINOv2) would likely be able to better capture aspects of the images that should give proper features for the model to select on and discriminate with.  Having a more robust model with a deeper structure could greatly improve the accuracy.
-For the Atlantic GOES data, there are a large number of differences in the setup of the data, even though they appear to be similar in scope.  They are likely taken at different heights and at different locations with very different physical features underneith. Training on combined sets of data from both hemispheres could mitigate these issues. 
+For the Atlantic GOES data, there are a large number of differences in the setup of the data, even though they appear to be similar in scope.  They are likely taken at different heights and at different locations with very different physical features underneath. Training on combined sets of data from both hemispheres could mitigate these issues. 
 
-In the future, the Kalman filter would also be better incorporated. When it was used previously, images and best track were taken every 6 hours. This is the restriction of the best track data and how it is gathered. In that amount of time, there cannot be a linear relationship of velocity assumed, as the storm can accelerate or decellerate significantly over such periods. 
+In the future, the Kalman filter would also be better incorporated. When it was used previously, images and best track were taken every 6 hours. This is the restriction of the best track data and how it is gathered. In that amount of time, there cannot be a linear relationship of velocity assumed, as the storm can accelerate or decelerate significantly over such periods. 
 
-Also, there is a large amount of data that could be incorporated including the different shapes (that were removed in the part 4 process) and other aspects (including: central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater,	he longest radius of 50kt winds or greater,	the shortest radius of 50kt winds or greater,	direction of the longest radius of 30kt winds or greater,	the longest radius of 30kt winds or greater,	the shortest radius of 30kt winds or greater, which are all important characteristics of the hurricane).
+Also, there is a large amount of data that could be incorporated including the different shapes (that were removed in the part 4 process) and other aspects (including: central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater, he longest radius of 50kt winds or greater, the shortest radius of 50kt winds or greater, direction of the longest radius of 30kt winds or greater, the longest radius of 30kt winds or greater,  the shortest radius of 30kt winds or greater, which are all important characteristics of the hurricane).
 
-Overall, this was a very useful exercise, and the data that was cleaned and pre-processed may be able to be used in future operational assignments to help predict the longitude and latitude of tropical cyclones.  While accuracy of center predictions left much to be desired, a structure for continued research was established and could be easily continued. I would like to thank Adam and Rasel for their help and encouragement along the way.
+Overall, this was a very useful exercise, and the data that was cleaned and pre-processed may be able to be used in future operational assignments to help predict the longitude and latitude of tropical cyclones.  While accuracy of center predictions left much to be desired, a structure for continued research was established and could be easily continued. I would like to thank Adam and Rasel for their help and encouragement along the way, and I hope to make some final compelling aspects before my final presentation.
+
+
 
 
 
