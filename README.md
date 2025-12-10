@@ -1,6 +1,6 @@
 # Hurricane Center Computer Vision Project
 A tool to mark the "best track center" and intensity prediction of a hurricane from satellite images using various satellite products alongside in situ measurements.
-
+NOTE: The terms "hurricane", "typhoon", and "tropical cyclone" refer to the storms in different areas of the globe.  For simplicity, the term "hurricane" is used throughout, though often "tropical cyclone" or "TC" is used to refer to the same weather phenomena.
 ## Part 1 - Conceptual design
 
 ### Problem description
@@ -141,14 +141,71 @@ To run the test code, cd into the part_3_code_example_kalman_filter folder and u
 
 Note: Part 3 composed with the assistance of ChatGPT System using model 5.0, link provided to prompt run here: [Prompt](https://chatgpt.com/share/6936f083-7f64-8007-98f6-db3692725bce)
 
-## Part 4 - Final Solution
+## Part 4 - Final solution
 ### Justification of the choice of classifier
+In this final solution, a few changes were made in order to help fine tune and achieve greater accuracy with the model.  A major one was the images that formed a smaller selection for the training in this round. The original size of the database used in training was 3,945 images. After filtering for the ones that had the proper best track information as to the hurricane's location on the image, 2,915 images remained.  After discussing with Adam and looking at a number of the images, it was decided to select only a smaller subset of the images that better represented the hurricanes that are "mature", that is, have the look of a typical hurricane with a spiral pattern and a well defined eye center. These were classified by hand by me (although, as I will discuss later, there is metadata in the labels of the image names that uses more standard metrics that could help subset the images). After choosing these images, there were 691 images that were used to train the various models.
+The first was the same simple YOLO (MobileNetV2, which I will call YOLO_v2) with the Kalman filter used in the previous section, section 3B.  I also tried a few more classifiers as well, including a simple multilayer perceptron with a linear layer, ReLU activation function, and dropout layer. Both were run for 20 epochs, and reasonable convergence of the loss functions were achieved.
+An attempt at the newest model of YOLO, (version 8), using a similar structure to the lightweight as well as a DINOv2 model, both without Kalman filters was made, but I was not able to debug the training in time due to the size of those models (both in structure and the large weights that were required to be downloaded).
 
 ### Classification accuracy achieved on the training and validation subsets
+The following are the loss functions for the YOLO_v2 and the MLP versions of the classifier.
+
+#### YOLO_v2
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+  <img src="part_4_prediction_examples\loss_function_graphs\yolo_v2_loss.png" alt="example_7.png" style="height:200px;">
+</div>
+
+#### MLP
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+  <img src="part_4_prediction_examples\loss_function_graphs\mlp_loss.png" alt="example_7.png" style="height:200px;">
+</div>
+
 
 ### Short commentary related to the observed accuracy and ideas for improvements
+There while the accuracy of the training and testing of both models did shrink rapidly, the ability of the models to accurately predict the centers in the images was very minimal, as can be seen in this selection of the images.
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+  <img src="part_4_prediction_examples\mlp_predictions\pred_examples\test/2015248N.HALOLA.2015.07.24.0600.HIMARAWI-8-9.ir_resize.png" alt="2015248N.HALOLA.2015.07.24.0600.HIMARAWI-8-9.ir_resize.png" style="height:200px;">
+  <img src="part_4_prediction_examples\mlp_predictions\pred_examples\test/2017223N.LAN.2017.10.21.0600.HIMARAWI-8-9.ir_resize.png" alt="2017223N.LAN.2017.10.21.0600.HIMARAWI-8-9.ir_resize.png" style="height:200px;">
+  <img src="part_4_prediction_examples\mlp_predictions\pred_examples\test/2017281N.NORU.2017.08.03.1200.HIMARAWI-8-9.ir_resize.png" alt="2017281N.NORU.2017.08.03.1200.HIMARAWI-8-9.ir_resize.png" style="height:200px;">
+  <img src="part_4_prediction_examples\mlp_predictions\pred_examples\test/2020240N.HAISHEN.2020.09.05.0000.HIMARAWI-8-9.ir_resize.png" alt="2020240N.HAISHEN.2020.09.05.0000.HIMARAWI-8-9.ir_resize.png" style="height:200px;">
+  <img src="part_4_prediction_examples\mlp_predictions\pred_examples\test/2022243N.HINNAMNOR.2022.09.03.1200.HIMARAWI-8-9.ir_resize.png" alt="2022243N.HINNAMNOR.2022.09.03.1200.HIMARAWI-8-9.ir_resize.png" style="height:200px;">
+</div>
 
 ### Instructions how to run example code
+For the MLP, download the weights from the Google drive link [here](). Then, cd into the part_4_code_example\part_4_mlp directory and run the infer_from_model.py. It should use the selected images to generate the images with the ground truth and the prediction.
 
 
-## Part 5 - Final 
+
+In this part you should have your complete solution up and running, evaluated on the validation subset. Not yet perfect, but it should be ready for final testing. Usually, if you already implemented preprocessing, segmentation and feature extraction, the classification is left for this part. Again, customized projects may need discussion with Adam to agree on concrete deliverables. 
+
+What to deliver?
+
+A report (no page limit, but try to be concise; 1000-2000 words should suffice) as a separate "Part 4" section of the readme.md in your GitHub that includes:
+A justification of the choice of classifier. For instance, if you selected SVM with RBF kernel, say why you think this classifier is good for your project. (3 points)
+A classification accuracy achieved on the training and validation subsets. That is, how many objects were classified correctly and how many of them were classified incorrectly (It is better to provide a percentage instead of numbers). Students working on object detection may report Intersection over UnionLinks to an external site. averaged over the training and testing samples. More advanced students (especially those attending the 60535 section of the course) can select the performance metrics that best suit their given problem (for instance, Precision-Recall, f-measure, plot ROC curves, etc.) and justify the use of these metrics. (1 points)
+A short commentary related to the observed accuracy and ideas for improvements. For instance, if you see almost perfect accuracy on the training set, and much worse on the validation set, what does that mean? If this is not desired, what do you think you could do to improve the generalization capabilities of your solution? You can think about one really small improvement (out of all improvements you propose in this report) to be implemented before the final testing. (5 points)
+
+Push your final (to be graded) codes along with instructions how to run them (either Adam or TAs will do it to see how the final solution works on test data). Your program(s) should pick one example from the test set (please attach this sample to your codes) and present the processing result. We should be able to run your programs without any edits -- please double check before submission that the codes are complete. (6 points)
+
+
+## Part 5 - Final update
+### Description of the test database you collected or downloaded
+After training the above in the different parts, I was using a "test set" that was derived from the original dataset provided by the authors of the [paper by Dr. Thanh-Ha Do, and Dr. Duc-Tien Du](https://www.nature.com/articles/s41598-025-12733-w), using a 80-20-20% train, validation, test split. In addition, I included approximately ______ images of a different hurricane satellite imagery from a single hurricane, Hurricane Erin, from 2025, that my research group is studying more intensely after a coordinated field campaign that launched a large variety of measurement instruments before, during, and after its passage close to Florida. The satellite images for this part were collected from the [Geostationary Operational Environmental Satellites (GOES)-R Series](https://www.ncei.noaa.gov/products/satellite/goes-r) and were downloaded, extracted, and organized by me using code that I hope to be able to share publically to better facilitate the use of the images for similar projects. The test data set is very different than the one used for training and validation for a variety of reasons. First, there are in entirely different hemispheres of the globe. Though there are in very different areas, their structures and movements are very much related. The images can be seen to be very similar therefore, and using them to test my final programs is a good use case, because the inspiration of this project was to have a way to use the trained computer vision system to predict the center of the hurricane in an image that is pulled from the GOES Satellites. These images are taken and uploaded at approximately every 10 minutes, and so it could be a useful way to find the centers quickly in an live situation.
+
+### Classification accuracy achieved on the test set
+
+### Reasons for solution performance 
+Images and best track were taken every 6 hours
+Different shapes and other aspects (Central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater,	he longest radius of 50kt winds or greater,	the shortest radius of 50kt winds or greater,	direction of the longest radius of 30kt winds or greater,	the longest radius of 30kt winds or greater,	the shortest radius of 30kt winds or greater
+)
+### Possible improvements to lower observed error rates
+
+
+
+The aim of this last part of the semester project is to test your solutions on unknown data. By "unknown data" I mean a sequestered set of samples, not used (or seen) when you were designing your method in previous phases.
+
+As your final deliverable submit a report (no page limit, but try to be concise; 1000-2000 words should suffice) as a separate (from Parts 1, 2, 3 and 4) section of the readme.md in your GitHub that includes:
+
+Description of the test database you collected or downloaded: What is the size of the database? What is different when compared to the training and validation subsets? Why you believe these differences are sufficient to test your final programs? (1 points)
+A classification accuracy achieved on the test set. Use the same metrics as in previous phase. (1 points)
+Most of you should see worse results on the test set when compared to the results obtained on train/validation sets. You should not be worried about that, but please provide the reasons why your solution performs worse (with a few illustrations, such as pictures or videos, what went wrong). What improvements would you propose to lower the observed error rates? (3 points)
