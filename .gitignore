@@ -2,3 +2,5 @@ data_from_tien/satellite_2015-2023/satellite/TC_biendong_625x500-2015-2023_Himaw
 data_from_tien/satellite_2015-2023.tar.gz
 data_from_tien/satellite_2015-2023/satellite/TC_biendong_625x500-2015-2023_Himawari.zip
 part_4_prediction_examples/mlp_predictions/dino_mlp_model.pth
+part_4_prediction_examples/all_predictions_run_1
+part_4_prediction_examples/kalman_gifs_run_1/animations_all
