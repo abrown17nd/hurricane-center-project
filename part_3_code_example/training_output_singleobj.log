@@ -1,0 +1,36 @@
+/users/abrown17/.local/lib/python3.9/site-packages/torch/utils/data/dataloader.py:627: UserWarning: This DataLoader will create 2 worker processes in total. Our suggested max number of worker in current system is 1, which is smaller than what this DataLoader is going to create. Please be aware that excessive worker creation might get DataLoader running slow or even freeze, lower the worker number to avoid potential slowness/freeze if necessary.
+  warnings.warn(
+/users/abrown17/.local/lib/python3.9/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/users/abrown17/.local/lib/python3.9/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=MobileNet_V2_Weights.IMAGENET1K_V1`. You can also use `weights=MobileNet_V2_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+Saved split CSV to random_groups.csv with counts: train=1749, val=583, test=583
+Epoch 001 | train_loss=0.090549 | val_loss=0.049138 | val_avg_iou=0.3678 | val_center_dist=62.89 px | val_recall_iou50=0.367
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 002 | train_loss=0.038410 | val_loss=0.043352 | val_avg_iou=0.4278 | val_center_dist=59.16 px | val_recall_iou50=0.547
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 003 | train_loss=0.029942 | val_loss=0.044170 | val_avg_iou=0.4135 | val_center_dist=60.97 px | val_recall_iou50=0.485
+Epoch 004 | train_loss=0.023541 | val_loss=0.045832 | val_avg_iou=0.4096 | val_center_dist=59.21 px | val_recall_iou50=0.487
+Epoch 005 | train_loss=0.020099 | val_loss=0.048413 | val_avg_iou=0.4239 | val_center_dist=64.13 px | val_recall_iou50=0.525
+Epoch 006 | train_loss=0.017738 | val_loss=0.052257 | val_avg_iou=0.4371 | val_center_dist=63.69 px | val_recall_iou50=0.540
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 007 | train_loss=0.015664 | val_loss=0.051933 | val_avg_iou=0.4459 | val_center_dist=61.83 px | val_recall_iou50=0.563
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 008 | train_loss=0.014486 | val_loss=0.053599 | val_avg_iou=0.4605 | val_center_dist=63.49 px | val_recall_iou50=0.588
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 009 | train_loss=0.013234 | val_loss=0.053387 | val_avg_iou=0.4513 | val_center_dist=63.60 px | val_recall_iou50=0.581
+Epoch 010 | train_loss=0.012381 | val_loss=0.054045 | val_avg_iou=0.4540 | val_center_dist=62.12 px | val_recall_iou50=0.581
+Epoch 011 | train_loss=0.011863 | val_loss=0.055385 | val_avg_iou=0.4604 | val_center_dist=62.03 px | val_recall_iou50=0.583
+Epoch 012 | train_loss=0.011372 | val_loss=0.059733 | val_avg_iou=0.4362 | val_center_dist=63.24 px | val_recall_iou50=0.561
+Epoch 013 | train_loss=0.010712 | val_loss=0.057409 | val_avg_iou=0.4426 | val_center_dist=65.36 px | val_recall_iou50=0.559
+Epoch 014 | train_loss=0.010513 | val_loss=0.056774 | val_avg_iou=0.4466 | val_center_dist=67.19 px | val_recall_iou50=0.571
+Epoch 015 | train_loss=0.009709 | val_loss=0.060101 | val_avg_iou=0.4606 | val_center_dist=63.19 px | val_recall_iou50=0.585
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 016 | train_loss=0.009278 | val_loss=0.070007 | val_avg_iou=0.4527 | val_center_dist=67.01 px | val_recall_iou50=0.564
+Epoch 017 | train_loss=0.008960 | val_loss=0.063731 | val_avg_iou=0.4662 | val_center_dist=62.93 px | val_recall_iou50=0.583
+Checkpoint saved to best_tiny_yolo_single.pth
+Epoch 018 | train_loss=0.008572 | val_loss=0.061829 | val_avg_iou=0.4610 | val_center_dist=65.23 px | val_recall_iou50=0.592
+Epoch 019 | train_loss=0.008294 | val_loss=0.064641 | val_avg_iou=0.4593 | val_center_dist=67.12 px | val_recall_iou50=0.578
+Epoch 020 | train_loss=0.007907 | val_loss=0.074975 | val_avg_iou=0.4602 | val_center_dist=67.24 px | val_recall_iou50=0.585
+Loss curve saved to loss_curve.png
+Final test metrics: {'avg_iou': 0.45198803442625773, 'avg_center_dist': 68.59335657856705, 'recall_iou50': 0.5660377358490566, 'n': 583}
