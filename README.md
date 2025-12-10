@@ -132,6 +132,7 @@ This is an illustration of the code for the YOLO along with the Kalman filter. N
 </div>
 
 ### Code summary and instructions for running example
+(For both, the weights were small in size and were therefore included in the code in the repo)
 (Part 3A, YOLO)
 To run the test code, cd into the part_3_code_example_single_object_yolo folder and use python3 to run the file run_on_sample_subset.py, which uses the best_tiny_yolo_single.pth to execute on the training_and_testing_samples which has 30 examples.
 
@@ -193,20 +194,16 @@ However, the model on the new test data did not work as well. The following is a
 </div>
 Clearly, this is very far from the center of the hurricane, and reasons why will be discussed in the next section.
 
-### Reasons for solution performance 
-Images and best track were taken every 6 hours
-Different shapes and other aspects (Central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater,	he longest radius of 50kt winds or greater,	the shortest radius of 50kt winds or greater,	direction of the longest radius of 30kt winds or greater,	the longest radius of 30kt winds or greater,	the shortest radius of 30kt winds or greater)
+### Reasons for solution performance and possible improvements to lower observed error rates
+There are a variety of reasons for the solution performance.  First, on the test data, the model was not super accurate on the validation examples, and so it would be expected to also not be very accurate in the test data.  Improving the model to be more robust (using the actual YOLO v8 or the DINOv2) would likely be able to better capture aspects of the images that should give proper features for the model to select on and discriminate with.  Having a more robust model with a deeper structure could greatly improve the accuracy.
+For the Atlantic GOES data, there are a large number of differences in the setup of the data, even though they appear to be similar in scope.  They are likely taken at different heights and at different locations with very different physical features underneith. Training on combined sets of data from both hemispheres could mitigate these issues. 
 
-### Possible improvements to lower observed error rates
+In the future, the Kalman filter would also be better incorporated. When it was used previously, images and best track were taken every 6 hours. This is the restriction of the best track data and how it is gathered. In that amount of time, there cannot be a linear relationship of velocity assumed, as the storm can accelerate or decellerate significantly over such periods. 
+
+Also, there is a large amount of data that could be incorporated including the different shapes (that were removed in the part 4 process) and other aspects (including: central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater,	he longest radius of 50kt winds or greater,	the shortest radius of 50kt winds or greater,	direction of the longest radius of 30kt winds or greater,	the longest radius of 30kt winds or greater,	the shortest radius of 30kt winds or greater, which are all important characteristics of the hurricane).
+
+Overall, this was a very useful exercise, and the data that was cleaned and pre-processed may be able to be used in future operational assignments to help predict the longitude and latitude of tropical cyclones.  While accuracy of center predictions left much to be desired, a structure for continued research was established and could be easily continued. I would like to thank Adam and Rasel for their help and encouragement along the way.
 
 
 
 
-
-The aim of this last part of the semester project is to test your solutions on unknown data. By "unknown data" I mean a sequestered set of samples, not used (or seen) when you were designing your method in previous phases.
-
-As your final deliverable submit a report (no page limit, but try to be concise; 1000-2000 words should suffice) as a separate (from Parts 1, 2, 3 and 4) section of the readme.md in your GitHub that includes:
-
-Description of the test database you collected or downloaded: What is the size of the database? What is different when compared to the training and validation subsets? Why you believe these differences are sufficient to test your final programs? (1 points)
-A classification accuracy achieved on the test set. Use the same metrics as in previous phase. (1 points)
-Most of you should see worse results on the test set when compared to the results obtained on train/validation sets. You should not be worried about that, but please provide the reasons why your solution performs worse (with a few illustrations, such as pictures or videos, what went wrong). What improvements would you propose to lower the observed error rates? (3 points)
