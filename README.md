@@ -59,22 +59,12 @@ This data set has 3,945 individual objects as images of a particular time from a
 As stated above, this data set uses the IR1 spectral channel, resized to 625×500 pixels in PNG format for the geographical region of the Biển Đông (East Sea, also known as the South China Sea). Since this is a static view of the sea that contains the TCs, it can be used easily for comparison across the different images.
 
 
-In this part you should have your data preprocessing, segmentation and feature extraction implemented. Some customized projects may not follow this standard pipeline, so remember to discuss with Adam what are the appropriate deliverables for you in this phase. 
-
-What to do and what to deliver?
-
-A report (no page limit, but try to be concise; 1000-2000 words should suffice) as a separate "Part 3" section of the readme.md in your GitHub that includes:
-A list of the methods already applied for data pre-processing and feature extraction (1 points).
-A justification why you decided to use these algorithms (6 points). For instance, if you used Canny edge detection and Hough transform to detect lines, say why you believe this feature extraction is good for your project.
-A few illustrations demonstrating how your methods processed the training data, for instance show a few segmentation results (3 points).
-For teams: explain individual contributions of each team member (this is needed to have this assignment graded).
-Push your current codes to your project repository (5 points). These codes should implement what you described in the report. Provide instructions how to run your codes on a data example (attach this example to your codes). Either Adam or the TA will run them to see how the current solution works.
-
 ## Part 3 - First Update 
 ### Methods already applied
-(Part 3A, YOLO)
-After cleaning and organizing the data (and the fact that it took longer to get the ground truth labels working), two simple models were used.  The first was a YOLO (You Only Look Once) model, then an improvement, and then 
 
+After cleaning and organizing the data (and the fact that it took longer to get the ground truth labels working), two simple models were used.  The first was a simple YOLO (You Only Look Once) version model using the first YOLO version architecture with just 3 epochs to debug, then an improvement to that model using the pretrained backbone version 2 as well as by running it longer, and then a Kalman filter was also applied to the model to predict the direction of the hurricane in the successive frames.
+
+(Part 3A, YOLO) 
 The script trains a compact, single-object variant of a YOLO-style detector. Each image contains one storm center, supplied through bounding boxes in a CSV file. The data loader reads each image, resizes it to a fixed resolution, and converts the bounding box into a YOLO-style grid target. The image is divided into an S×S grid; the cell containing the storm center receives an objectness flag plus normalized box parameters. All other cells indicate no object.
 
 A lightweight MobileNetV2 backbone extracts convolutional features. These features are adaptively pooled to an S×S spatial map. A final 1×1 convolution produces five values per cell: objectness, center offsets, and normalized width and height. Sigmoid activations constrain outputs to usable ranges. The loss function combines objectness loss (penalizing false positives and false negatives) with a coordinate regression loss applied only to the true object cell.
@@ -82,7 +72,7 @@ A lightweight MobileNetV2 backbone extracts convolutional features. These featur
 Training proceeds over randomly split train/validation/test groups, with performance evaluated by IoU, center-distance error, and IoU-50 recall. During inference, the model selects the cell with the highest objectness score and decodes its box prediction back to image coordinates. The approach essentially mimics YOLOv1 behavior but simplified to the single-object case, enabling focused storm-center localization.
 
 (Part 3B, YOLO and Kalman filter)
-The TinyYOLO-based model above produces single-frame bounding-box estimates, including the center coordinates (cx, cy), width, height, and an objectness score for a detected storm. Each prediction is independent and inherently noisy due to factors such as illumination changes, cloud morphology, and background texture. Satellite storms generally drift smoothly, but the detector output may jump slightly from frame to frame because convolutional networks do not enforce temporal consistency. A Kalman filter addresses this missing temporal structure by integrating predictions over time.
+The TinyYOLO-based model above produces single-frame bounding-box estimates, including the center coordinates (cx, cy), width, height, and an objectness score for a detected storm. Each prediction is independent and inherently noisy due to factors such as illumination changes, cloud morphology, and background texture. Storms observed by satellite can drift smoothly, but the detector output may jump slightly from frame to frame because convolutional networks do not enforce temporal consistency. A Kalman filter addresses this missing temporal structure by integrating predictions over time.
 
 In this context, the Kalman filter defines a state vector that can include position, velocity, and size, typically [cx, cy, vx, vy, w, h]^T. The prediction step uses a constant-velocity model to forecast the storm’s next location, producing a smooth estimate of where it should appear in the next frame. The detector output serves as a noisy measurement, and the Kalman equations blend the predicted state with the measured state according to their uncertainties. High detector confidence moves the estimate closer to the measurement, while low confidence retains proximity to the prediction.
 
@@ -151,3 +141,14 @@ To run the test code, cd into the part_3_code_example_kalman_filter folder and u
 
 Note: Part 3 composed with the assistance of ChatGPT System using model 5.0, link provided to prompt run here: [Prompt](https://chatgpt.com/share/6936f083-7f64-8007-98f6-db3692725bce)
 
+## Part 4 - Final Solution
+### Justification of the choice of classifier
+
+### Classification accuracy achieved on the training and validation subsets
+
+### Short commentary related to the observed accuracy and ideas for improvements
+
+### Instructions how to run example code
+
+
+## Part 5 - Final 
