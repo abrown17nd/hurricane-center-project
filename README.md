@@ -175,20 +175,31 @@ There while the accuracy of the training and testing of both models did shrink r
 For the MLP, download the weights from the Google drive link [here](https://drive.google.com/file/d/1O7ko1iF_esuEihmELitYx8XlbHuXf-YX/view?usp=sharing) into the part_4_code_example\part_4_mlp folder of this repo. Then, cd into the that directory and run the infer_from_model.py. It should use the selected images to generate the images with the ground truth and the prediction (similar to the ones shown above).
 
 
-
-
-
 ## Part 5 - Final update
 ### Description of the test database you collected or downloaded
 After training the above in the different parts, I was using a "test set" that was derived from the original dataset provided by the authors of the [paper by Dr. Thanh-Ha Do, and Dr. Duc-Tien Du](https://www.nature.com/articles/s41598-025-12733-w), using a 80-20-20% train, validation, test split. In addition, I included approximately ______ images of a different hurricane satellite imagery from a single hurricane, Hurricane Erin, from 2025, that my research group is studying more intensely after a coordinated field campaign that launched a large variety of measurement instruments before, during, and after its passage close to Florida. The satellite images for this part were collected from the [Geostationary Operational Environmental Satellites (GOES)-R Series](https://www.ncei.noaa.gov/products/satellite/goes-r) and were downloaded, extracted, and organized by me using code that I hope to be able to share publically to better facilitate the use of the images for similar projects. The test data set is very different than the one used for training and validation for a variety of reasons. First, there are in entirely different hemispheres of the globe. Though there are in very different areas, their structures and movements are very much related. The images can be seen to be very similar therefore, and using them to test my final programs is a good use case, because the inspiration of this project was to have a way to use the trained computer vision system to predict the center of the hurricane in an image that is pulled from the GOES Satellites. These images are taken and uploaded at approximately every 10 minutes, and so it could be a useful way to find the centers quickly in an live situation.
 
 ### Classification accuracy achieved on the test set
+Since there were two sets of test data, the original 20% of the split, as well as the more recent attempt to apply this network to the unseen satellite images from the other hemisphere (in the Atlantic Ocean), I will briefly describe the accuracy achieved by both of these methods. The first is using the predictions versus the ground truth distance by taking the Euclidean distance between the two points. Below are the total MSE of these.  
+Test data, MSE distance: 11524.81
+Validation - Mean squared distance: 8997.604
+It is clear to see that the model did fairly well on the test data, as this was in a similar domain, and the images were chosen to be so randomly pulling to compare. This is also evidenced by the spread of the MSE histogram between the two, with the test being shifted up compared to the validation.
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+  <img src="part_5_final_update/prediction_distance_histogram.png" alt="example_7.png" style="height:200px;">
+</div>
+However, the model on the new test data did not work as well. The following is a single sample of the output of the model on the Atlantic satellite image.
+<div style="display: flex; overflow-x: auto; gap: 10px; padding: 10px;">
+  <img src="part_5_final_update/attempted_prediction_GOES.png" alt="example_7.png" style="height:200px;">
+</div>
+Clearly, this is very far from the center of the hurricane, and reasons why will be discussed in the next section.
 
 ### Reasons for solution performance 
 Images and best track were taken every 6 hours
-Different shapes and other aspects (Central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater,	he longest radius of 50kt winds or greater,	the shortest radius of 50kt winds or greater,	direction of the longest radius of 30kt winds or greater,	the longest radius of 30kt winds or greater,	the shortest radius of 30kt winds or greater
-)
+Different shapes and other aspects (Central pressure, maximum sustained wind speed, radius of maximal wind speed, Direction of the longest radius of 50kt winds or greater,	he longest radius of 50kt winds or greater,	the shortest radius of 50kt winds or greater,	direction of the longest radius of 30kt winds or greater,	the longest radius of 30kt winds or greater,	the shortest radius of 30kt winds or greater)
+
 ### Possible improvements to lower observed error rates
+
+
 
 
 
