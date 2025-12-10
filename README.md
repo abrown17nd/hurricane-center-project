@@ -172,20 +172,10 @@ There while the accuracy of the training and testing of both models did shrink r
 </div>
 
 ### Instructions how to run example code
-For the MLP, download the weights from the Google drive link [here](). Then, cd into the part_4_code_example\part_4_mlp directory and run the infer_from_model.py. It should use the selected images to generate the images with the ground truth and the prediction.
+For the MLP, download the weights from the Google drive link [here](https://drive.google.com/file/d/1O7ko1iF_esuEihmELitYx8XlbHuXf-YX/view?usp=sharing) into the part_4_code_example\part_4_mlp folder of this repo. Then, cd into the that directory and run the infer_from_model.py. It should use the selected images to generate the images with the ground truth and the prediction (similar to the ones shown above).
 
 
 
-In this part you should have your complete solution up and running, evaluated on the validation subset. Not yet perfect, but it should be ready for final testing. Usually, if you already implemented preprocessing, segmentation and feature extraction, the classification is left for this part. Again, customized projects may need discussion with Adam to agree on concrete deliverables. 
-
-What to deliver?
-
-A report (no page limit, but try to be concise; 1000-2000 words should suffice) as a separate "Part 4" section of the readme.md in your GitHub that includes:
-A justification of the choice of classifier. For instance, if you selected SVM with RBF kernel, say why you think this classifier is good for your project. (3 points)
-A classification accuracy achieved on the training and validation subsets. That is, how many objects were classified correctly and how many of them were classified incorrectly (It is better to provide a percentage instead of numbers). Students working on object detection may report Intersection over UnionLinks to an external site. averaged over the training and testing samples. More advanced students (especially those attending the 60535 section of the course) can select the performance metrics that best suit their given problem (for instance, Precision-Recall, f-measure, plot ROC curves, etc.) and justify the use of these metrics. (1 points)
-A short commentary related to the observed accuracy and ideas for improvements. For instance, if you see almost perfect accuracy on the training set, and much worse on the validation set, what does that mean? If this is not desired, what do you think you could do to improve the generalization capabilities of your solution? You can think about one really small improvement (out of all improvements you propose in this report) to be implemented before the final testing. (5 points)
-
-Push your final (to be graded) codes along with instructions how to run them (either Adam or TAs will do it to see how the final solution works on test data). Your program(s) should pick one example from the test set (please attach this sample to your codes) and present the processing result. We should be able to run your programs without any edits -- please double check before submission that the codes are complete. (6 points)
 
 
 ## Part 5 - Final update
