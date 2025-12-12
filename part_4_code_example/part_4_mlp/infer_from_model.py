@@ -155,7 +155,7 @@ def main(args):
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Visualize DINO MLP predictions for val/test splits with selected images")
     parser.add_argument("--csv", type=str, default="random_groups.csv", help="CSV file with split_group column")
-    parser.add_argument("--images", type=str, default="images/TC_biendong_625x500-2015-2023_Himawari", help="Folder containing input images")
+    parser.add_argument("--images", type=str, default="selected_images", help="Folder containing input images")
     parser.add_argument("--ckpt", type=str, default="dino_mlp_model.pth", help="Trained model checkpoint")
     parser.add_argument("--out_folder", type=str, default="pred_examples", help="Output folder for prediction images")
     args = parser.parse_args()
